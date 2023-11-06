@@ -9,5 +9,5 @@ export function PopulateWords(word: string) {
     related.set([
         word
     ]);
-    related.set(compares);
+    // related.set(compares);
 }

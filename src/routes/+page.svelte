@@ -18,12 +18,19 @@
                 >
                 enter word
                 </label>
+                <form>
+                    
+                </form>
                 <input
                 type="text"
                 id="textinput"
                 name="textinput"
                 placeholder="type here!"
                 bind:value={userString}
+                on:keydown={(e) => {
+                    if (e.keyCode === 13)
+                    AutoComplete.PopulateWords(userString);
+                }}
                 >
                 <button
                 id="submit"
@@ -34,7 +41,7 @@
                 >
                     submit
                 </button>
-                <p>results</p>
+                <p id="resultslabel">results</p>
                 <div id="results">
                     {#each $related as string}
                         <p>{string}</p>
@@ -84,23 +91,26 @@
     div.items {
         display: flex;
         position: absolute;
+        flex-direction: column;
+        height: 100%;
+        max-height: calc(100% - 40px);
         width: 100%;
         max-width: 600px;
-        max-height: calc(100% - 40px);
-        border-radius: 25px;
-        border: 2px solid yellow;
-        background-color: green;
-        height: 100%;
-        width: 100%;
-        flex-direction: column;
         gap: 8px;
         padding: 20px;
+        border-radius: 25px;
+        border: 2px solid #FA9B9B;
         background-color: #1b1429;
+    }
+
+    #resultslabel {
+        cursor: default;
     }
 
     #results {
         display: flex;
         flex-flow: column wrap;
+        border-radius: 25px;
         background-color: #575163;
         padding: 4px;
         height: 100%;
@@ -116,6 +126,7 @@
         padding: 20px;
         font-size: 24px;
         margin-bottom: 20px;
+        border-radius: 25px;
         height: 24px;
         color: #1b1429;
         background-color: #9BA3FA;
@@ -142,7 +153,7 @@
         background-color: #575163;
         color: #D19BFA;
         font-size: 24px;
-        line-height: 24px;
+        height: 54px;
         text-align: center;
         cursor: pointer;
         pointer-events: auto;

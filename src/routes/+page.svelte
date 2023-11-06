@@ -1,6 +1,8 @@
 <script lang="ts">
     import * as AutoComplete from './autocomplete';
+    import { related } from './autocomplete';
 
+    let userString = "";
 </script>
 <html lang="en">
     <head>
@@ -8,22 +10,35 @@
         <title>My Page</title>
     </head>
     <body>
-        <div class="wrapper center">
-            <div class="items center">
-                <div class="columns">
-
-                </div>
-                <div class="columns">
-                    <button
-                    id="submit"
-                    title="submit"
-                    on:click={() => {
-                        AutoComplete.PopulateWords("hellow");
-                    }}
-                    >
-                        Submit
-                    </button>
-
+        <div class="wrapper">
+            <div class="items">
+                <label
+                for="textinput"
+                
+                >
+                enter word
+                </label>
+                <input
+                type="text"
+                id="textinput"
+                name="textinput"
+                placeholder="type here!"
+                bind:value={userString}
+                >
+                <button
+                id="submit"
+                title="submit"
+                on:click={() => {
+                    AutoComplete.PopulateWords(userString);
+                }}
+                >
+                    submit
+                </button>
+                <p>results</p>
+                <div id="results">
+                    {#each $related as string}
+                        <p>{string}</p>
+                    {/each}
                 </div>
             </div>
         </div>
@@ -32,10 +47,10 @@
 </html>
 <style>
     html, body {
-        background-image: linear-gradient(to bottom right, #4CA837, #fff);
+        background-image: linear-gradient(to bottom right, #B29BFA, #FA9BD3);
         margin: 0px;
         padding: 0px;
-        --fontsize: 20px;
+        font-size: 24px;
     }
 
     :global(html) {
@@ -44,67 +59,89 @@
     }
 
     body {
-        color: var(--neutralheavy);
+        color: #F09BFA;
         height: 100vh;
         width: 100vw;
         position: relative;
         overflow: hidden;
     }
 
-    .center {
+    div.wrapper {
         display: flex;
         justify-content: center;
         align-items: center;
         text-align: center;
-    }
-
-    .wrapper {
-        display: grid;
-        grid-template: 15% 60% 15% / 1fr;
-        transition: grid-template 0.5s ease;
-        vertical-align: middle;
-        text-align: center;
-        height: 100%;
-        width: 100%;
+        align-items: stretch;
+        margin-top: 20px;
+        margin-bottom: 20px;
         transition: 0.5s;
-    }
-
-    div.items {
-        grid-row: 2;
-        width: 80%;
-        max-width: 1200px;
-        height: 100%;
-        max-height: 800px;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        grid-gap: 8px;
-        border-radius: 25px;
-        background-color: green;
-        border: 2px solid yellow;
-        margin: auto;
-        font-size: var(--fontsize);
-        grid-column-start: initial;
     }
 
     * {
         box-sizing: border-box;
         font-family: ExoRegular, Arial, Helvetica, sans-serif;
     }
-    div.columns {
+    div.items {
         display: flex;
+        position: absolute;
+        width: 100%;
+        max-width: 600px;
+        max-height: calc(100% - 40px);
+        border-radius: 25px;
+        border: 2px solid yellow;
+        background-color: green;
         height: 100%;
         width: 100%;
         flex-direction: column;
         gap: 8px;
         padding: 20px;
-        background-color: gray;
+        background-color: #1b1429;
     }
 
-    button {
+    #results {
+        display: flex;
+        flex-flow: column wrap;
+        background-color: #575163;
+        padding: 4px;
+        height: 100%;
+        overflow: hidden;
+        text-align: left;
+    }
+
+    label {
+        color: #9BA3FA;
+    }
+
+    #textinput {
+        padding: 20px;
+        font-size: 24px;
+        margin-bottom: 20px;
+        height: 24px;
+        color: #1b1429;
+        background-color: #9BA3FA;
+        border: none;
+        text-align: center;
+        box-shadow: none;
+        outline: none;
+    }
+
+    #textinput:focus {
+        outline: none;
+    }
+
+    p {
+        margin: 0px;
+        padding: 0px;
+    }
+
+    #submit {
+        margin-bottom: 8px;
         border-radius: 25px;
         min-width: 60px;
-        border: 2px solid #0000dd;
-        font-size: var(--fontsize);
+        border: 2px solid #D19BFA;
+        background-color: #575163;
+        color: #D19BFA;
+        font-size: 24px;
         line-height: 24px;
         text-align: center;
         cursor: pointer;
@@ -117,28 +154,28 @@
         -ms-animation: fadeIn .5s;
     }
 
-    button:disabled {
-        color: var(--neutraldark);
+    #submit:disabled {
+        color: #D19BFA;
     }
 
-    button:not(:focus-visible) {
-        border: 2px solid var(--divback);
+    #submit:not(:focus-visible) {
+        border: 2px solid #D19BFA;
     }
 
     @media(hover: hover) {
-        button:hover, button:focus-visible {
-            transform: scale(1.1);
-            -webkit-transform: scale(1.1);
-            -moz-transform: scale(1.1);
-            -o-transform: scale(1.1);
-            -ms-transform: scale(1.1);
+        #submit:hover, #submit:focus-visible {
+            transform: scale(1.05);
+            -webkit-transform: scale(1.05);
+            -moz-transform: scale(1.05);
+            -o-transform: scale(1.05);
+            -ms-transform: scale(1.05);
         }
     }
-    button:active {
-        transform: scale(0.9);
-        -webkit-transform: scale(0.9);
-        -moz-transform: scale(0.9);
-        -o-transform: scale(0.9);
-        -ms-transform: scale(0.9);
+    #submit:active {
+        transform: scale(0.95);
+        -webkit-transform: scale(0.95);
+        -moz-transform: scale(0.95);
+        -o-transform: scale(0.95);
+        -ms-transform: scale(0.95);
     }
 </style>

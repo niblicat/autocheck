@@ -7,7 +7,7 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <title>My Page</title>
+        <title>Auto Complete</title>
     </head>
     <body>
         <div class="wrapper">

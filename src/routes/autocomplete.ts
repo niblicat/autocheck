@@ -6,15 +6,17 @@ const compares: string[] = Dictionary.split('\n');
 
 export var related: Writable<string[]> = writable([]);
 
-export function PopulateWords(word: string) {
-    related.set([
-        word
-    ]);
+export function CompareWords(word: string) {
+
+}
+
+function PopulateWords(words: string[]) {
+    related.set(words);
     // related.set(compares);
 }
 
 export function PrintMatrix(userString: string): number[][] {
-    let secondString = "cold";
+    let secondString = "mean";
 
     let length: number = (userString.length > secondString.length) ? userString.length : secondString.length;
     // want square matrix with one extra row and column
@@ -47,32 +49,46 @@ function MakeSquareMatrix(length: number) : number[][] {
     return matrix;
 }
 
-function isVowel(character: string) {
-    return character === "A" || character === "E" || character === "I" || character === "O" || character === "U";
+function IsVowel(c: string): boolean {
+    let r = c.toUpperCase();
+    return r === "A" || r === "E" || r === "I" || r === "O" || r === "U";
+}
+function IsConsonant(c: string): boolean {
+    let r = c.toUpperCase();
+    return r === "B" || r === "C" || r === "D" || r === "F" || r === "G" || r === "H" || r === "J" || r === "K" || r === "L" || r === "M" || r === "N" || r === "P" || r === "Q" || r === "R" || r === "S" || r === "T" || r === "V" || r === "W" || r === "X" || r === "Y" || r === "Z";
 }
 
 function SequenceAlignment(matrix: number[][], string1: string, string2: string, gap: number, light: number, heavy: number) {
     let rows: number = matrix.length;
     let columns: number = matrix[0].length;
+
     if (rows != columns)
         throw new Error("Rows Not Equal To Columns; Matrix Must Be Square");
 
-    for (let i = 1; i < (rows); i++) {
+    for (let i = 1; i < rows; i++) {
         matrix[i][0] = i * gap;
         matrix[0][i] = i * gap;
     }
 
-    for (let i = 1; i++; i < rows) {
+    for (let i = 1; i < rows; i++) {
         
-        for (let j = 1; j++; j < rows) {
-            let min: number = 0;
-            if (string1[i -  1] !== string2[i - 1])
-                matrix[i][j] = matrix[i - 1][j - 1];
-            // else {
-            //     matrix[i][j] = Math.min(
-            //         matrix[i - 1][j - 1] + 
-            //     );
-            // }
+        for (let j = 1; j < rows; j++) {
+            let diagonalPenalty = matrix[i - 1][j - 1];
+
+            if (string1[i - 1] === string2[j - 1])
+                diagonalPenalty; // characters match
+            else if ((IsVowel(string1[i - 1]) && IsVowel(string2[j - 1]))
+                    || (IsConsonant(string1[i - 1]) && IsConsonant(string2[j - 1])))
+                diagonalPenalty += light; // vowel/vowel consonant/consonant match
+            else
+                diagonalPenalty += heavy; // no match
+
+
+            matrix[i][j] = Math.min(
+                diagonalPenalty,
+                gap + matrix[i - 1][j],
+                gap + matrix[i][j - 1],
+            );
         }
     }
 

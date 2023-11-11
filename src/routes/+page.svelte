@@ -31,14 +31,14 @@
                 bind:value={userString}
                 on:keydown={(e) => {
                     if (e.key === 'Enter')
-                    AutoComplete.PopulateWords(userString);
+                    AutoComplete.CompareWords(userString);
                 }}
                 >
                 <button
                 id="submit"
                 title="submit"
                 on:click={() => {
-                    AutoComplete.PopulateWords(userString);
+                    AutoComplete.CompareWords(userString);
                 }}
                 >
                     submit
@@ -66,7 +66,7 @@
                 {#each matrix as outer}
                 <p class="debug">
                     {#each outer as inner}
-                        {inner}
+                        {inner},
                     {/each}
                 </p>
                 {/each}

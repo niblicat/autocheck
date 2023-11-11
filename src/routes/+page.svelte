@@ -2,7 +2,12 @@
     import * as AutoComplete from './autocomplete';
     import { related } from './autocomplete';
 
+    const debug: boolean = true;
+
     let userString = "";
+
+    let matrix: Number[][] = [];
+
 </script>
 <html lang="en">
     <head>
@@ -49,6 +54,27 @@
                 </div>
             </div>
         </div>
+        {#if debug}
+            <button
+            id="testmatrix"
+            title="testmatrix"
+            on:click={() => {
+                matrix = AutoComplete.PrintMatrix(userString);
+            }}
+            >
+            test matrix
+            </button>
+            <br>
+            {#if matrix}
+                {#each matrix as outer}
+                <p class="debug">
+                    {#each outer as inner}
+                        {inner}
+                    {/each}
+                </p>
+                {/each}
+            {/if}
+        {/if}
     </body>
 
 </html>
@@ -88,6 +114,11 @@
         box-sizing: border-box;
         font-family: ExoRegular, Arial, Helvetica, sans-serif;
     }
+
+    .debug {
+        color: #ff0000;
+    }
+
     div.items {
         display: flex;
         position: absolute;
@@ -122,7 +153,7 @@
         color: #9BA3FA;
     }
 
-    #textinput {
+    input {
         padding: 20px;
         font-size: 24px;
         margin-bottom: 20px;
@@ -136,7 +167,7 @@
         outline: none;
     }
 
-    #textinput:focus {
+    input:focus {
         outline: none;
     }
 
@@ -145,7 +176,7 @@
         padding: 0px;
     }
 
-    #submit {
+    button {
         margin-bottom: 8px;
         border-radius: 25px;
         min-width: 60px;
@@ -165,16 +196,16 @@
         -ms-animation: fadeIn .5s;
     }
 
-    #submit:disabled {
+    button:disabled {
         color: #D19BFA;
     }
 
-    #submit:not(:focus-visible) {
+    button:not(:focus-visible) {
         border: 2px solid #D19BFA;
     }
 
     @media(hover: hover) {
-        #submit:hover, #submit:focus-visible {
+        button:hover, button:focus-visible {
             transform: scale(1.05);
             -webkit-transform: scale(1.05);
             -moz-transform: scale(1.05);
@@ -182,7 +213,7 @@
             -ms-transform: scale(1.05);
         }
     }
-    #submit:active {
+    button:active {
         transform: scale(0.95);
         -webkit-transform: scale(0.95);
         -moz-transform: scale(0.95);

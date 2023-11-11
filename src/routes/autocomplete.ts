@@ -12,6 +12,10 @@ export function PopulateWords(word: string) {
     // related.set(compares);
 }
 
+export function PrintMatrix(userstring: string): Number[][] {
+    return MakeMatrix(userstring, "cold")
+}
+
 function MakeMatrix(word1: string, word2: string) : Number[][] {
     let size1 = word1.length;
     let size2 = word2.length;

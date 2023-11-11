@@ -1,6 +1,8 @@
 import { writable, type Writable } from "svelte/store";
 import Dictionary from '$lib/dictionary.txt?raw';
-import { sequence } from "@sveltejs/kit/hooks";
+import { stringify } from "querystring";
+import { report } from "process";
+
 
 const compares: string[] = Dictionary.split('\n');
 
@@ -13,20 +15,33 @@ export function PopulateWords(word: string) {
     // related.set(compares);
 }
 
-export function PrintMatrix(userstring: string): number[][] {
+export function PrintMatrix(userString: string): number[][] {
     let secondString = "cold";
-    let matrix: number[][] = MakeMatrix(userstring.length, secondString.length);
 
-    return SequenceAlignment(matrix, 2, 1, 3);
+    let length: number = (userString.length > secondString.length) ? userString.length : secondString.length;
+    // want square matrix with one extra row and column
+    length++;
+    let matrix: number[][] = MakeSquareMatrix(length);
+
+    try {
+        matrix = SequenceAlignment(matrix, 2, 1, 3)
+    } catch (error) {
+        let message;
+        if (error instanceof Error) message = error.message;
+        else message = String(error);
+        reportError({message});
+    }
+
+    return matrix;
 }
 
 // Initialise as all zeroes
-function MakeMatrix(rows: number, columns: number) : number[][] {
+function MakeSquareMatrix(length: number) : number[][] {
     let matrix: number[][] = [];
 
-    for (let i = 0; i < rows; i++) {
+    for (let i = 0; i < length; i++) {
         matrix[i] = [];
-        for (let j = 0; j < columns; j++) {
+        for (let j = 0; j < length; j++) {
             matrix[i][j] = 0;
         }
     }
@@ -37,11 +52,13 @@ function MakeMatrix(rows: number, columns: number) : number[][] {
 function SequenceAlignment(matrix: number[][], gap: number, light: number, heavy: number) {
     let rows: number = matrix.length;
     let columns: number = matrix[0].length;
+    if (rows != columns) throw new Error("Rows Not Equal To Columns; Matrix Must Be Square");
 
-    alert(rows);
-    alert(columns);
+    for (let i = 1; i < (columns); i++) {
+        matrix[i][0] = i * gap;
+        matrix[0][i] = i * gap;
+    }
 
-    
 
     return matrix;
 }

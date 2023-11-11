@@ -6,7 +6,7 @@
 
     let userString = "";
 
-    let matrix: Number[][] = [];
+    let matrix: number[][] = [];
 
 </script>
 <html lang="en">
@@ -23,9 +23,6 @@
                 >
                 enter word
                 </label>
-                <form>
-                    
-                </form>
                 <input
                 type="text"
                 id="textinput"

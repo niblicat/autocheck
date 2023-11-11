@@ -22,7 +22,7 @@ export function PrintMatrix(userString: string): number[][] {
     let matrix: number[][] = MakeSquareMatrix(length);
 
     try {
-        matrix = SequenceAlignment(matrix, 2, 1, 3)
+        matrix = SequenceAlignment(matrix, userString, secondString, 2, 1, 3)
     } catch (error) {
         let message;
         if (error instanceof Error) message = error.message;
@@ -47,17 +47,34 @@ function MakeSquareMatrix(length: number) : number[][] {
     return matrix;
 }
 
-function SequenceAlignment(matrix: number[][], gap: number, light: number, heavy: number) {
+function isVowel(character: string) {
+    return character === "A" || character === "E" || character === "I" || character === "O" || character === "U";
+}
+
+function SequenceAlignment(matrix: number[][], string1: string, string2: string, gap: number, light: number, heavy: number) {
     let rows: number = matrix.length;
     let columns: number = matrix[0].length;
-    if (rows != columns) throw new Error("Rows Not Equal To Columns; Matrix Must Be Square");
+    if (rows != columns)
+        throw new Error("Rows Not Equal To Columns; Matrix Must Be Square");
 
-    for (let i = 1; i < (columns); i++) {
+    for (let i = 1; i < (rows); i++) {
         matrix[i][0] = i * gap;
         matrix[0][i] = i * gap;
     }
 
-    
+    for (let i = 1; i++; i < rows) {
+        
+        for (let j = 1; j++; j < rows) {
+            let min: number = 0;
+            if (string1[i -  1] !== string2[i - 1])
+                matrix[i][j] = matrix[i - 1][j - 1];
+            // else {
+            //     matrix[i][j] = Math.min(
+            //         matrix[i - 1][j - 1] + 
+            //     );
+            // }
+        }
+    }
 
     return matrix;
 }

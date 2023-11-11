@@ -1,7 +1,5 @@
 import { writable, type Writable } from "svelte/store";
 import Dictionary from '$lib/dictionary.txt?raw';
-import { stringify } from "querystring";
-import { report } from "process";
 
 
 const compares: string[] = Dictionary.split('\n');
@@ -59,6 +57,7 @@ function SequenceAlignment(matrix: number[][], gap: number, light: number, heavy
         matrix[0][i] = i * gap;
     }
 
+    
 
     return matrix;
 }

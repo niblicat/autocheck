@@ -13,7 +13,7 @@
     let results: HTMLElement[] = [];
 
     afterUpdate(() => {
-        HideOverflowed;
+        HideOverflowed();
     });
 
     function HideOverflowed() {

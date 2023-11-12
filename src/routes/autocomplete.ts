@@ -40,7 +40,7 @@ export function CompareWords(word: string, gap: number, light: number, heavy: nu
         results[myPenalty].push(element);
     });
 
-    const final = Unfold3DTo2D(results);
+    const final = Unfold3DTo2D(results).slice(0, 150);
     PopulateWords(final);
 }
 

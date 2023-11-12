@@ -66,7 +66,7 @@
                 {#each matrix as outer}
                 <p class="debug">
                     {#each outer as inner}
-                        {inner},
+                        {inner}&nbsp;
                     {/each}
                 </p>
                 {/each}

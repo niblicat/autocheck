@@ -1,8 +1,34 @@
 <script lang="ts">
     import * as AutoComplete from './autocomplete';
     import { related } from './autocomplete';
+    import { afterUpdate } from 'svelte';
+
+    const debug: boolean = false;
 
     let userString = "";
+
+    let matrix: number[][] = [];
+
+    let resultsList: HTMLElement;
+    let results: HTMLElement[] = [];
+
+    afterUpdate(() => {
+        HideOverflowed();
+    });
+
+    function HideOverflowed() {
+        const containerWidth = resultsList.clientWidth;
+
+        results.forEach(result => {
+            const offsetLeft = result.offsetLeft;
+            const {width} = result.getBoundingClientRect();
+            if (offsetLeft + width > containerWidth)
+                result.classList.add('invisible');
+            else
+                result.classList.remove('invisible');
+        })
+    }
+
 </script>
 <html lang="en">
     <head>
@@ -18,9 +44,6 @@
                 >
                 enter word
                 </label>
-                <form>
-                    
-                </form>
                 <input
                 type="text"
                 id="textinput"
@@ -29,26 +52,55 @@
                 bind:value={userString}
                 on:keydown={(e) => {
                     if (e.key === 'Enter')
-                    AutoComplete.PopulateWords(userString);
+                        AutoComplete.CompareWords(userString, 2, 1 ,3);
                 }}
                 >
                 <button
                 id="submit"
                 title="submit"
                 on:click={() => {
-                    AutoComplete.PopulateWords(userString);
+                    AutoComplete.CompareWords(userString, 2, 1, 3);
                 }}
                 >
                     submit
                 </button>
                 <p id="resultslabel">results</p>
-                <div id="results">
-                    {#each $related as string}
-                        <p>{string}</p>
+                <div 
+                id="results"
+                bind:this={resultsList}
+                >
+                    {#each $related as string, i}
+                        <p 
+                        class="result"
+                        bind:this={results[i]}
+                        >
+                        {string}
+                        </p>
                     {/each}
                 </div>
             </div>
         </div>
+        {#if debug}
+            <button
+            id="testmatrix"
+            title="testmatrix"
+            on:click={() => {
+                matrix = AutoComplete.PrintMatrix(userString);
+            }}
+            >
+            test matrix
+            </button>
+            <br>
+            {#if matrix}
+                {#each matrix as outer}
+                <p class="debug">
+                    {#each outer as inner}
+                        {inner}&nbsp;
+                    {/each}
+                </p>
+                {/each}
+            {/if}
+        {/if}
     </body>
 
 </html>
@@ -60,7 +112,7 @@
         font-size: 24px;
     }
 
-    :global(html) {
+    :global(html), :global(body) {
         margin: 0px;
         padding: 0px;
     }
@@ -88,6 +140,11 @@
         box-sizing: border-box;
         font-family: ExoRegular, Arial, Helvetica, sans-serif;
     }
+
+    .debug {
+        color: #ff0000;
+    }
+
     div.items {
         display: flex;
         position: absolute;
@@ -112,17 +169,24 @@
         flex-flow: column wrap;
         border-radius: 25px;
         background-color: #575163;
+        column-gap: 8px;
         padding: 4px;
+        width: 100%;
         height: 100%;
         overflow: hidden;
         text-align: left;
+        box-sizing: border-box;
+    }
+
+    :global(.invisible) {
+        visibility: hidden;
     }
 
     label {
         color: #9BA3FA;
     }
 
-    #textinput {
+    input {
         padding: 20px;
         font-size: 24px;
         margin-bottom: 20px;
@@ -136,7 +200,7 @@
         outline: none;
     }
 
-    #textinput:focus {
+    input:focus {
         outline: none;
     }
 
@@ -145,7 +209,7 @@
         padding: 0px;
     }
 
-    #submit {
+    button {
         margin-bottom: 8px;
         border-radius: 25px;
         min-width: 60px;
@@ -165,16 +229,16 @@
         -ms-animation: fadeIn .5s;
     }
 
-    #submit:disabled {
+    button:disabled {
         color: #D19BFA;
     }
 
-    #submit:not(:focus-visible) {
+    button:not(:focus-visible) {
         border: 2px solid #D19BFA;
     }
 
     @media(hover: hover) {
-        #submit:hover, #submit:focus-visible {
+        button:hover, button:focus-visible {
             transform: scale(1.05);
             -webkit-transform: scale(1.05);
             -moz-transform: scale(1.05);
@@ -182,7 +246,7 @@
             -ms-transform: scale(1.05);
         }
     }
-    #submit:active {
+    button:active {
         transform: scale(0.95);
         -webkit-transform: scale(0.95);
         -moz-transform: scale(0.95);

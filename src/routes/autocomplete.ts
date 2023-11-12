@@ -56,7 +56,7 @@ export function CompareWords(word: string, count: number, gap: number, light: nu
 }
 
 // puts all of the words from the given string array into the on screen textbox
-function PopulateWords(words: string[]) {
+export function PopulateWords(words: string[]) {
     related.set(words);
 }
 

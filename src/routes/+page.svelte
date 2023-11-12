@@ -3,9 +3,20 @@
     import { related } from './autocomplete';
 
     const debug: boolean = false;
-    const responsive: boolean = true;
-    let userString = "";
-    let matrix: number[][] = [];
+    var responsive: boolean = false;
+    var userString = "";
+    var matrix: number[][] = [];
+
+    function ChangeResponsive() {
+        if (userString === "")
+            AutoComplete.PopulateWords([""])
+        else if (responsive) {
+            AutoComplete.CompareWords(userString, 15, 2, 1 ,3);
+        }
+        else
+            AutoComplete.CompareWords(userString, 17, 2, 1 ,3);
+        responsive = !responsive
+    }
 
 </script>
 
@@ -17,27 +28,43 @@
     <body>
         <div class="wrapper">
             <div class="items">
-                <label
-                for="textinput"
-                
-                >
+                <label for="textinput">
                 enter word
                 </label>
-                <input
-                type="text"
-                id="textinput"
-                name="textinput"
-                placeholder="type here!"
-                bind:value={userString}
-                on:keydown={(e) => {
-                    if (responsive && (e.key === 'Enter'))
-                        AutoComplete.CompareWords(userString, 15, 2, 1 ,3);
-                }}
-                on:input={() => {
-                    if (responsive)
-                        AutoComplete.CompareWords(userString, 17, 2, 1 ,3);
-                }}
-                >
+                <div id="inputwrapper">
+                    <input
+                    type="text"
+                    id="textinput"
+                    name="textinput"
+                    placeholder="type here!"
+                    title="type here!"
+                    bind:value={userString}
+                    on:keydown={(e) => {
+                        if (!responsive && (e.key === 'Enter'))
+                            AutoComplete.CompareWords(userString, 15, 2, 1 ,3);
+                    }}
+                    on:input={() => {
+                        if (responsive)
+                            AutoComplete.CompareWords(userString, 17, 2, 1 ,3);
+                    }}
+                    >
+                    <label
+                    class="switch"
+                    for="responsive"
+                    title="responsive"
+                    >
+                        <input
+                        type="checkbox"
+                        id="responsive"
+                        name="responsive"
+                        checked={responsive}
+                        on:click={() => {
+                            ChangeResponsive();
+                        }}
+                        >
+                        <span class="slider"></span>
+                    </label>
+                </div>
                 {#if !responsive}
                     <button
                     id="submit"
@@ -54,10 +81,7 @@
                 id="results"
                 >
                     {#each $related as string}
-                        <!-- {alert(string)} -->
-                        <p class="result">
-                        {string}
-                        </p>
+                        <p class="result">{string}</p>
                     {/each}
                 </div>
             </div>
@@ -164,12 +188,19 @@
         color: #9BA3FA;
     }
 
-    input {
+    #inputwrapper {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+
+    input[type="text"] {
         padding: 20px;
         font-size: 24px;
-        margin-bottom: 20px;
         border-radius: 25px;
         height: 24px;
+        width: calc(100% - 88px);
         color: #1b1429;
         background-color: #9BA3FA;
         border: none;
@@ -180,6 +211,69 @@
 
     input:focus {
         outline: none;
+    }
+
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 76px;
+        height: 44px;
+        margin: 0px;
+        padding: 0px;
+        transition: all .2s ease-in-out;
+        animation: fadeIn .5s;
+        -webkit-animation: fadeIn .5s;
+        -moz-animation: fadeIn .5s;
+        -o-animation: fadeIn .5s;
+        -ms-animation: fadeIn .5s;
+    }
+
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+        margin: 0px;
+        padding: 0px;
+    }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #575163;
+        -webkit-transition: .5s;
+        transition: .5s;
+        border-radius: 25px;
+    }
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 36px;
+        width: 36px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        -webkit-transition: .4s;
+        transition: .4s;
+        border-radius: 50%;
+    }
+
+    input:checked + .slider {
+        background-color: #D19BFA;
+    }
+
+    input:focus + .slider {
+        box-shadow: 0 0 1px #D19BFA;
+    }
+
+    input:checked + .slider:before {
+        -webkit-transform: translateX(32px);
+        -ms-transform: translateX(32px);
+        transform: translateX(32px);
     }
 
     p {
@@ -223,7 +317,15 @@
             -o-transform: scale(1.05);
             -ms-transform: scale(1.05);
         }
+        .switch:hover {
+            transform: scale(1.1);
+            -webkit-transform: scale(1.1);
+            -moz-transform: scale(1.1);
+            -o-transform: scale(1.1);
+            -ms-transform: scale(1.1);
+        }
     }
+
     button:active {
         transform: scale(0.95);
         -webkit-transform: scale(0.95);

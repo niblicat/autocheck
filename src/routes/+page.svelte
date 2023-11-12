@@ -112,7 +112,7 @@
         font-size: 24px;
     }
 
-    :global(html) {
+    :global(html), :global(body) {
         margin: 0px;
         padding: 0px;
     }

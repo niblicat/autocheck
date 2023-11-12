@@ -1,12 +1,34 @@
 <script lang="ts">
     import * as AutoComplete from './autocomplete';
     import { related } from './autocomplete';
+    import { onMount } from 'svelte';
 
     const debug: boolean = true;
 
     let userString = "";
 
     let matrix: number[][] = [];
+    
+    onMount(() => {
+    window.addEventListener('load', filterClippedItems);
+});
+
+function filterClippedItems() {
+    const resultsContainer = document.getElementById('results');
+    if (resultsContainer === null) {
+        throw new Error("Results Container is Null");
+    }
+    const resultItems = resultsContainer.getElementsByClassName('result');
+
+    for (const item of resultItems) {
+        const rect = item.getBoundingClientRect();
+        if (rect.left > resultsContainer.clientLeft) {
+            // Cast the element to HTMLElement to access the style property
+            const htmlElement = item as HTMLElement;
+            htmlElement.style.display = 'none';
+        }
+    }
+}
 
 </script>
 <html lang="en">
@@ -31,14 +53,14 @@
                 bind:value={userString}
                 on:keydown={(e) => {
                     if (e.key === 'Enter')
-                    AutoComplete.CompareWords(userString);
+                    AutoComplete.CompareWords(userString, 2, 1 ,3);
                 }}
                 >
                 <button
                 id="submit"
                 title="submit"
                 on:click={() => {
-                    AutoComplete.CompareWords(userString);
+                    AutoComplete.CompareWords(userString, 2, 1, 3);
                 }}
                 >
                     submit
@@ -46,7 +68,7 @@
                 <p id="resultslabel">results</p>
                 <div id="results">
                     {#each $related as string}
-                        <p>{string}</p>
+                        <p class="result">{string}</p>
                     {/each}
                 </div>
             </div>
@@ -140,10 +162,12 @@
         flex-flow: column wrap;
         border-radius: 25px;
         background-color: #575163;
+        column-gap: 8px;
         padding: 4px;
         height: 100%;
         overflow: hidden;
         text-align: left;
+        box-sizing: border-box;
     }
 
     label {

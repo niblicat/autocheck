@@ -6,10 +6,42 @@ const compares: string[] = Dictionary.split('\n');
 
 export var related: Writable<string[]> = writable([]);
 
-export function CompareWords(word: string) {
-    // compare words and enter into vector by penalty size
+function Unfold3DTo2D(array: string[][]): string[] {
+    return array
+        .filter((arr): arr is string[] => arr !== undefined) // filter out undefined arrays
+        .reduce((result, arr) => result.concat(arr), [] as string[]);
+}
 
-    PopulateWords(compares);
+export function CompareWords(word: string, gap: number, light: number, heavy: number) {
+    // compare words and enter into vector by penalty size
+    let maxPenalty = Math.max(...compares.map(el => el.length)) * 3;
+
+    let results: string[][] = [];
+
+    // initialise results 3d array
+    for (let i = 0; i < maxPenalty; i++) {
+        results[i] = [];
+    }
+
+    compares.forEach(element => {
+        const length: number = Math.max(word.length, element.length);
+        let myMatrix = MakeSquareMatrix(length);
+
+        try {
+            myMatrix = SequenceAlignment(myMatrix, word, element, gap, light, heavy)
+        } catch (error) {
+            let message;
+            if (error instanceof Error) message = error.message;
+            else message = String(error);
+            reportError({message});
+        }
+
+        const myPenalty = PenaltyScore(myMatrix);
+        results[myPenalty].push(element);
+    });
+
+    const final = Unfold3DTo2D(results);
+    PopulateWords(final);
 }
 
 function PopulateWords(words: string[]) {
@@ -20,7 +52,7 @@ function PopulateWords(words: string[]) {
 export function PrintMatrix(userString: string): number[][] {
     let secondString = "mean";
 
-    let length: number = (userString.length > secondString.length) ? userString.length : secondString.length;
+    let length: number = Math.max(userString.length, secondString.length);
     // want square matrix with one extra row and column
     length++;
     let matrix: number[][] = MakeSquareMatrix(length);
@@ -34,13 +66,11 @@ export function PrintMatrix(userString: string): number[][] {
         reportError({message});
     }
 
-    alert(PenaltyScore(matrix));
-
     return matrix;
 }
 
 // Initialise as all zeroes
-function MakeSquareMatrix(length: number) : number[][] {
+function MakeSquareMatrix(length: number): number[][] {
     let matrix: number[][] = [];
 
     for (let i = 0; i < length; i++) {
@@ -109,9 +139,11 @@ function SequenceAlignment(matrix: number[][], string1: string, string2: string,
     return matrix;
 }
 
+// max penalty is 3*strlen
+
 function PenaltyScore(matrix: number[][]): number {
     let rows: number = matrix.length;
     let columns: number = matrix[0].length;
 
-    return matrix[rows - 1][columns - 1]
+    return matrix[rows - 1][columns - 1];
 }

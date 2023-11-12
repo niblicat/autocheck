@@ -1,18 +1,29 @@
 import { writable, type Writable } from "svelte/store";
 import Dictionary from '$lib/dictionary.txt?raw';
 
-
 const compares: string[] = Dictionary.split('\n');
 
 export var related: Writable<string[]> = writable([]);
 
-function Unfold3DTo2D(array: string[][]): string[] {
-    return array
-        .filter((arr): arr is string[] => arr !== undefined) // filter out undefined arrays
-        .reduce((result, arr) => result.concat(arr), [] as string[]);
+// turns 3d string array into 2d results array of given size numStrings
+function Unfold3DTo2D(dblarray: string[][], numStrings: number): string[] {
+    let results: string[] = [];
+
+    for (const array of dblarray) {
+        if (array === undefined)
+            continue;
+
+        results = results.concat(array);
+
+        if (results.length >= numStrings)
+            break;
+    }
+
+    return results.slice(0, numStrings);
 }
 
-export function CompareWords(word: string, gap: number, light: number, heavy: number) {
+// handles comparing the user word with every word in the dictionary
+export function CompareWords(word: string, count: number, gap: number, light: number, heavy: number) {
     // compare words and enter into vector by penalty size
     let maxPenalty = Math.max(...compares.map(el => el.length)) * 3;
 
@@ -40,15 +51,17 @@ export function CompareWords(word: string, gap: number, light: number, heavy: nu
         results[myPenalty].push(element);
     });
 
-    const final = Unfold3DTo2D(results).slice(0, 150);
+    const final = Unfold3DTo2D(results, count);
     PopulateWords(final);
 }
 
+// puts all of the words from the given string array into the on screen textbox
 function PopulateWords(words: string[]) {
     related.set(words);
-    // related.set(compares);
 }
 
+// for debugging purposes
+// prints the sequence alignment matrix
 export function PrintMatrix(userString: string): number[][] {
     let secondString = "mean";
 
@@ -83,15 +96,19 @@ function MakeSquareMatrix(length: number): number[][] {
     return matrix;
 }
 
+// returns true if the character is a vowel
 function IsVowel(c: string): boolean {
     const r = c.toUpperCase();
     return r === "A" || r === "E" || r === "I" || r === "O" || r === "U";
 }
+
+// returns true if the character is a consonant
 function IsConsonant(c: string): boolean {
     const r = c.toUpperCase();
     return r === "B" || r === "C" || r === "D" || r === "F" || r === "G" || r === "H" || r === "J" || r === "K" || r === "L" || r === "M" || r === "N" || r === "P" || r === "Q" || r === "R" || r === "S" || r === "T" || r === "V" || r === "W" || r === "X" || r === "Y" || r === "Z";
 }
 
+// returns strings with the same length as the maximum length string by filling shorter string with spaces
 function EqualiseStrings(string1: string, string2: string): [string, string] {
     const max = Math.max(string1.length, string2.length);
 
@@ -101,6 +118,7 @@ function EqualiseStrings(string1: string, string2: string): [string, string] {
     return [result1, result2];
 }
 
+// algorithm to create penalty matrix from two strings and penalties
 function SequenceAlignment(matrix: number[][], string1: string, string2: string, gap: number, light: number, heavy: number) {
     const rows: number = matrix.length;
     const columns: number = matrix[0].length;
@@ -141,6 +159,7 @@ function SequenceAlignment(matrix: number[][], string1: string, string2: string,
 
 // max penalty is 3*strlen
 
+// returns the last item (penalty score) in the matrix
 function PenaltyScore(matrix: number[][]): number {
     let rows: number = matrix.length;
     let columns: number = matrix[0].length;

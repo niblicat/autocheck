@@ -1,37 +1,14 @@
 <script lang="ts">
     import * as AutoComplete from './autocomplete';
     import { related } from './autocomplete';
-    import { afterUpdate } from 'svelte';
 
     const debug: boolean = false;
-
+    const responsive: boolean = true;
     let userString = "";
-
     let matrix: number[][] = [];
-
-    let resultsList: HTMLElement;
-    let results: HTMLElement[] = [];
-
-    afterUpdate(() => {
-        HideOverflowed();
-    });
-
-    function HideOverflowed() {
-        const containerWidth = resultsList.clientWidth;
-
-        results.forEach(result => {
-            const offsetLeft = result.offsetLeft;
-            const {width} = result.getBoundingClientRect();
-            if (offsetLeft + width > containerWidth)
-                result.classList.add('invisible');
-            else
-                result.classList.remove('invisible');
-        })
-    }
 
 </script>
 
-<svelte:window on:resize={HideOverflowed}/>
 <html lang="en">
     <head>
         <meta charset="UTF-8">
@@ -53,29 +30,32 @@
                 placeholder="type here!"
                 bind:value={userString}
                 on:keydown={(e) => {
-                    if (e.key === 'Enter')
-                        AutoComplete.CompareWords(userString, 2, 1 ,3);
+                    if (responsive && (e.key === 'Enter'))
+                        AutoComplete.CompareWords(userString, 15, 2, 1 ,3);
+                }}
+                on:input={() => {
+                    if (responsive)
+                        AutoComplete.CompareWords(userString, 17, 2, 1 ,3);
                 }}
                 >
-                <button
-                id="submit"
-                title="submit"
-                on:click={() => {
-                    AutoComplete.CompareWords(userString, 2, 1, 3);
-                }}
-                >
-                    submit
-                </button>
+                {#if !responsive}
+                    <button
+                    id="submit"
+                    title="submit"
+                    on:click={() => {
+                        AutoComplete.CompareWords(userString, 15, 2, 1, 3);
+                    }}
+                    >
+                        submit
+                    </button>
+                {/if}
                 <p id="resultslabel">results</p>
                 <div 
                 id="results"
-                bind:this={resultsList}
                 >
-                    {#each $related as string, i}
-                        <p 
-                        class="result"
-                        bind:this={results[i]}
-                        >
+                    {#each $related as string}
+                        <!-- {alert(string)} -->
+                        <p class="result">
                         {string}
                         </p>
                     {/each}
@@ -168,20 +148,16 @@
 
     #results {
         display: flex;
-        flex-flow: column wrap;
+        flex-flow: column;
         border-radius: 25px;
         background-color: #575163;
         column-gap: 8px;
         padding: 4px;
         width: 100%;
         height: 100%;
-        overflow: hidden;
+        overflow: scroll;
         text-align: left;
         box-sizing: border-box;
-    }
-
-    :global(.invisible) {
-        visibility: hidden;
     }
 
     label {

@@ -13,7 +13,7 @@
     let results: HTMLElement[] = [];
 
     afterUpdate(() => {
-        HideOverflowed();
+        HideOverflowed;
     });
 
     function HideOverflowed() {
@@ -30,6 +30,8 @@
     }
 
 </script>
+
+<svelte:window on:resize={HideOverflowed}/>
 <html lang="en">
     <head>
         <meta charset="UTF-8">
